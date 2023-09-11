@@ -45,7 +45,6 @@ def countfiles(dictAuthorDates, lsttokens, repo):
                 shaUrl = 'https://api.github.com/repos/' + repo + '/commits/' + sha
                 shaDetails, ct = github_auth(shaUrl, lsttokens, ct)
                 filesjson = shaDetails['files']
-
                 for filenameObj in filesjson:
                     filename = filenameObj['filename']
                     if '/src/' in filename:
@@ -70,7 +69,7 @@ repo = 'scottyab/rootbeer'
 # Remember to empty the list when going to commit to GitHub.
 # Otherwise they will all be reverted and you will have to re-create them
 # I would advise to create more than one token for repos with heavy commits
-lstTokens = ["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"]
+lstTokens = [""]
 
 dictAuthorDates = dict()
 countfiles(dictAuthorDates, lstTokens, repo)
@@ -79,7 +78,7 @@ print('Total number of times files touched: ' + str(len(dictAuthorDates)))
 file = repo.split('/')[1]
 # change this to the path of your file
 fileOutput = 'data/file_' + file+'author' + '.csv'
-rows = ["Author: file", "date"]
+rows = ["Author file", "date"]
 fileCSV = open(fileOutput, 'w')
 writer = csv.writer(fileCSV)
 writer.writerow(rows)
