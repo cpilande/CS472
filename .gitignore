@@ -1,5 +1,6 @@
 
 .vs/VSWorkspaceState.json
-.vs/CS472/FileContentIndex/6e8c947d-709a-497d-bb53-95229986774d.vsidx
 .vs/CS472/v17/.wsuo
 .vs/slnx.sqlite
+.vs/ProjectSettings.json
+*.vsidx
