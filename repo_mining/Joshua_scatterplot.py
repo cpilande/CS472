@@ -6,7 +6,7 @@ import random
 
 def createNewColor(authorName, authorColorDict):
 	if authorName not in authorColorDict:
-		authorColorDict[authorName] =  [random.random() , random.random() , random.random()]
+		authorColorDict[authorName] =  [random.random(), random.random(), random.random()]
 
 def trackFileName(fileName, fileNameList):
 	if fileName not in fileNameList:
