@@ -12,8 +12,16 @@ def scatterPlot(reader):
 		nameCompounded= re.sub('[0-9]*_', '', unproccessedName)
 		authorName = re.sub(":\s.*", '', nameCompounded)
 		fileName = re.sub(".*:\s" , '', nameCompounded)
+
+		dateWithoutTime = re.sub("T.*", '', unproccessedDate)
+
+		dateYear = re.sub("\-.*","",dateWithoutTime)
+		# dateMonth = re.sub("","",dateYear)
+		# dateDay = re.sub("","",dateMonth)
 		next(reader)
-		print(authorName + "\n" + fileName + "\n" +unproccessedDate)
+
+		# pointList = [authorName, fileName, dateWithoutTime]
+		print(authorName + "\n" + fileName + "\n" + dateYear)
 
 
 		
