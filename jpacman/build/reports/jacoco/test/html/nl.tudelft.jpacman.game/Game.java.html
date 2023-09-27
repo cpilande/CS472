@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Game.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jpacman</a> &gt; <a href="index.source.html" class="el_package">nl.tudelft.jpacman.game</a> &gt; <span class="el_source">Game.java</span></div><h1>Game.java</h1><pre class="source lang-java linenums">package nl.tudelft.jpacman.game;
+
+import java.util.List;
+
+import nl.tudelft.jpacman.board.Direction;
+import nl.tudelft.jpacman.level.Level;
+import nl.tudelft.jpacman.level.Level.LevelObserver;
+import nl.tudelft.jpacman.level.Player;
+import nl.tudelft.jpacman.points.PointCalculator;
+
+/**
+ * A basic implementation of a Pac-Man game.
+ *
+ * @author Jeroen Roosen 
+ */
+public abstract class Game implements LevelObserver {
+
+    /**
+     * &lt;code&gt;true&lt;/code&gt; if the game is in progress.
+     */
+    private boolean inProgress;
+
+    /**
+     * Object that locks the start and stop methods.
+     */
+<span class="fc" id="L26">    private final Object progressLock = new Object();</span>
+
+    /**
+     * The algorithm used to calculate the points that
+     * they player gets whenever some action happens.
+     */
+    private PointCalculator pointCalculator;
+
+    /**
+     * Creates a new game.
+     *
+     * @param pointCalculator
+     *             The way to calculate points upon collisions.
+     */
+<span class="fc" id="L40">    protected Game(PointCalculator pointCalculator) {</span>
+<span class="fc" id="L41">        this.pointCalculator = pointCalculator;</span>
+<span class="fc" id="L42">        inProgress = false;</span>
+<span class="fc" id="L43">    }</span>
+
+    /**
+     * Starts or resumes the game.
+     */
+    public void start() {
+<span class="fc" id="L49">        synchronized (progressLock) {</span>
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">            if (isInProgress()) {</span>
+<span class="nc" id="L51">                return;</span>
+            }
+<span class="pc bpc" id="L53" title="2 of 4 branches missed.">            if (getLevel().isAnyPlayerAlive() &amp;&amp; getLevel().remainingPellets() &gt; 0) {</span>
+<span class="fc" id="L54">                inProgress = true;</span>
+<span class="fc" id="L55">                getLevel().addObserver(this);</span>
+<span class="fc" id="L56">                getLevel().start();</span>
+            }
+<span class="fc" id="L58">        }</span>
+<span class="fc" id="L59">    }</span>
+
+    /**
+     * Pauses the game.
+     */
+    public void stop() {
+<span class="fc" id="L65">        synchronized (progressLock) {</span>
+<span class="fc bfc" id="L66" title="All 2 branches covered.">            if (!isInProgress()) {</span>
+<span class="fc" id="L67">                return;</span>
+            }
+<span class="fc" id="L69">            inProgress = false;</span>
+<span class="fc" id="L70">            getLevel().stop();</span>
+<span class="fc" id="L71">        }</span>
+<span class="fc" id="L72">    }</span>
+
+    /**
+     * @return &lt;code&gt;true&lt;/code&gt; iff the game is started and in progress.
+     */
+    public boolean isInProgress() {
+<span class="fc" id="L78">        return inProgress;</span>
+    }
+
+    /**
+     * @return An immutable list of the participants of this game.
+     */
+    public abstract List&lt;Player&gt; getPlayers();
+
+    /**
+     * @return The level currently being played.
+     */
+    public abstract Level getLevel();
+
+    /**
+     * Moves the specified player one square in the given direction.
+     *
+     * @param player
+     *            The player to move.
+     * @param direction
+     *            The direction to move in.
+     */
+    public void move(Player player, Direction direction) {
+<span class="fc bfc" id="L100" title="All 2 branches covered.">        if (isInProgress()) {</span>
+            // execute player move.
+<span class="fc" id="L102">            getLevel().move(player, direction);</span>
+<span class="fc" id="L103">            pointCalculator.pacmanMoved(player, direction);</span>
+        }
+<span class="fc" id="L105">    }</span>
+
+    @Override
+    public void levelWon() {
+<span class="nc" id="L109">        stop();</span>
+<span class="nc" id="L110">    }</span>
+
+    @Override
+    public void levelLost() {
+<span class="fc" id="L114">        stop();</span>
+<span class="fc" id="L115">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
