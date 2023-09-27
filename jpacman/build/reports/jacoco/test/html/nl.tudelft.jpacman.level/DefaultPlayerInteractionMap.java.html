@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DefaultPlayerInteractionMap.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jpacman</a> &gt; <a href="index.source.html" class="el_package">nl.tudelft.jpacman.level</a> &gt; <span class="el_source">DefaultPlayerInteractionMap.java</span></div><h1>DefaultPlayerInteractionMap.java</h1><pre class="source lang-java linenums">package nl.tudelft.jpacman.level;
+
+import nl.tudelft.jpacman.board.Unit;
+import nl.tudelft.jpacman.npc.Ghost;
+import nl.tudelft.jpacman.points.PointCalculator;
+
+/**
+ * An extensible default interaction map for collisions caused by the player.
+ *
+ * The implementation makes use of the interactionmap, and as such can be easily
+ * and declaratively extended when new types of units (ghosts, players, ...) are
+ * added.
+ *
+ * @author Arie van Deursen
+ * @author Jeroen Roosen
+ *
+ */
+public class DefaultPlayerInteractionMap implements CollisionMap {
+
+    private PointCalculator pointCalculator;
+
+<span class="nc" id="L22">    private final CollisionMap collisions = defaultCollisions();</span>
+
+    /**
+     * Create a simple player-based collision map, informing the
+     * point calculator about points to be added.
+     *
+     * @param pointCalculator
+     *             Strategy for calculating points.
+     */
+<span class="nc" id="L31">    public DefaultPlayerInteractionMap(PointCalculator pointCalculator) {</span>
+<span class="nc" id="L32">        this.pointCalculator = pointCalculator;</span>
+<span class="nc" id="L33">    }</span>
+
+    @Override
+    public void collide(Unit mover, Unit movedInto) {
+<span class="nc" id="L37">        collisions.collide(mover, movedInto);</span>
+<span class="nc" id="L38">    }</span>
+
+    /**
+     * Creates the default collisions Player-Ghost and Player-Pellet.
+     *
+     * @return The collision map containing collisions for Player-Ghost and
+     *         Player-Pellet.
+     */
+    private CollisionInteractionMap defaultCollisions() {
+<span class="nc" id="L47">        CollisionInteractionMap collisionMap = new CollisionInteractionMap();</span>
+
+<span class="nc" id="L49">        collisionMap.onCollision(Player.class, Ghost.class,</span>
+            (player, ghost) -&gt; {
+<span class="nc" id="L51">                pointCalculator.collidedWithAGhost(player, ghost);</span>
+<span class="nc" id="L52">                player.setAlive(false);</span>
+<span class="nc" id="L53">                player.setKiller(ghost);</span>
+<span class="nc" id="L54">            });</span>
+
+<span class="nc" id="L56">        collisionMap.onCollision(Player.class, Pellet.class,</span>
+            (player, pellet) -&gt; {
+<span class="nc" id="L58">                pointCalculator.consumedAPellet(player, pellet);</span>
+<span class="nc" id="L59">                pellet.leaveSquare();</span>
+<span class="nc" id="L60">            });</span>
+<span class="nc" id="L61">        return collisionMap;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

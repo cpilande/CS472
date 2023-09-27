@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Clyde.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">jpacman</a> &gt; <a href="index.source.html" class="el_package">nl.tudelft.jpacman.npc.ghost</a> &gt; <span class="el_source">Clyde.java</span></div><h1>Clyde.java</h1><pre class="source lang-java linenums">package nl.tudelft.jpacman.npc.ghost;
+
+import nl.tudelft.jpacman.board.Direction;
+import nl.tudelft.jpacman.board.Square;
+import nl.tudelft.jpacman.board.Unit;
+import nl.tudelft.jpacman.level.Player;
+import nl.tudelft.jpacman.npc.Ghost;
+import nl.tudelft.jpacman.sprite.Sprite;
+
+import java.util.*;
+
+/**
+ * &lt;p&gt;
+ * An implementation of the classic Pac-Man ghost Clyde.
+ * &lt;/p&gt;
+ * &lt;p&gt;
+ * Pokey needs a new nickname because out of all the ghosts,
+ * Clyde is the least likely to &quot;C'lyde&quot; with Pac-Man. Clyde is always the last
+ * ghost out of the regenerator, and the loner of the gang, usually off doing
+ * his own thing when not patrolling the bottom-left corner of the maze. His
+ * behavior is very random, so while he's not likely to be following you in hot
+ * pursuit with the other ghosts, he is a little less predictable, and still a
+ * danger.
+ * &lt;/p&gt;
+ * &lt;p&gt;
+ * &lt;b&gt;AI:&lt;/b&gt; Clyde has two basic AIs, one for when he's far from Pac-Man, and
+ * one for when he is near to Pac-Man. 
+ * When Clyde is far away from Pac-Man (beyond eight grid spaces),
+ * Clyde behaves very much like Blinky, trying to move to Pac-Man's exact
+ * location. However, when Clyde gets within eight grid spaces of Pac-Man, he
+ * automatically changes his behavior and runs away.
+ * &lt;/p&gt;
+ * &lt;p&gt;
+ * Source: http://strategywiki.org/wiki/Pac-Man/Getting_Started
+ * &lt;/p&gt;
+ *
+ * @author Jeroen Roosen
+ */
+<span class="pc bpc" id="L39" title="1 of 2 branches missed.">public class Clyde extends Ghost {</span>
+
+    /**
+     * The amount of cells Clyde wants to stay away from Pac Man.
+     */
+    private static final int SHYNESS = 8;
+
+    /**
+     * The variation in intervals, this makes the ghosts look more dynamic and
+     * less predictable.
+     */
+    private static final int INTERVAL_VARIATION = 50;
+
+    /**
+     * The base movement interval.
+     */
+    private static final int MOVE_INTERVAL = 250;
+
+    /**
+     * A map of opposite directions.
+     */
+<span class="fc" id="L60">    private static final Map&lt;Direction, Direction&gt; OPPOSITES = new EnumMap&lt;&gt;(Direction.class);</span>
+
+    static {
+<span class="fc" id="L63">        OPPOSITES.put(Direction.NORTH, Direction.SOUTH);</span>
+<span class="fc" id="L64">        OPPOSITES.put(Direction.SOUTH, Direction.NORTH);</span>
+<span class="fc" id="L65">        OPPOSITES.put(Direction.WEST, Direction.EAST);</span>
+<span class="fc" id="L66">        OPPOSITES.put(Direction.EAST, Direction.WEST);</span>
+<span class="fc" id="L67">    }</span>
+
+    /**
+     * Creates a new &quot;Clyde&quot;, a.k.a. &quot;Pokey&quot;.
+     *
+     * @param spriteMap The sprites for this ghost.
+     */
+    public Clyde(Map&lt;Direction, Sprite&gt; spriteMap) {
+<span class="fc" id="L75">        super(spriteMap, MOVE_INTERVAL, INTERVAL_VARIATION);</span>
+<span class="fc" id="L76">    }</span>
+
+    /**
+     * {@inheritDoc}
+     *
+     * &lt;p&gt;
+     * Clyde has two basic AIs, one for when he's far from Pac-Man, and one for
+     * when he is near to Pac-Man. 
+     * When Clyde is far away from Pac-Man (beyond eight grid spaces),
+     * Clyde behaves very much like Blinky, trying to move to Pac-Man's exact
+     * location. However, when Clyde gets within eight grid spaces of Pac-Man,
+     * he automatically changes his behavior and runs away
+     * &lt;/p&gt;
+     */
+    @Override
+    public Optional&lt;Direction&gt; nextAiMove() {
+<span class="pc bpc" id="L92" title="2 of 4 branches missed.">        assert hasSquare();</span>
+
+<span class="fc" id="L94">        Unit nearest = Navigation.findNearest(Player.class, getSquare());</span>
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if (nearest == null) {</span>
+<span class="nc" id="L96">            return Optional.empty();</span>
+        }
+<span class="pc bpc" id="L98" title="2 of 4 branches missed.">        assert nearest.hasSquare();</span>
+<span class="fc" id="L99">        Square target = nearest.getSquare();</span>
+
+<span class="fc" id="L101">        List&lt;Direction&gt; path = Navigation.shortestPath(getSquare(), target, this);</span>
+<span class="pc bpc" id="L102" title="2 of 4 branches missed.">        if (path != null &amp;&amp; !path.isEmpty()) {</span>
+<span class="fc" id="L103">            Direction direction = path.get(0);</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">            if (path.size() &lt;= SHYNESS) {</span>
+<span class="fc" id="L105">                return Optional.ofNullable(OPPOSITES.get(direction));</span>
+            }
+<span class="fc" id="L107">            return Optional.of(direction);</span>
+        }
+<span class="nc" id="L109">        return Optional.empty();</span>
+    }
+
+    /**
+     * Determines a possible move in a random direction.
+     *
+     * @return A direction in which the ghost can move, or &lt;code&gt;null&lt;/code&gt; if
+     * the ghost is shut in by inaccessible squares.
+     */
+    @Override
+    protected Direction randomMove() {
+<span class="nc" id="L120">        Square square = getSquare();</span>
+<span class="nc" id="L121">        List&lt;Direction&gt; directions = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">        for (Direction direction : Direction.values()) {</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">            if (square.getSquareAt(direction).isAccessibleTo(this)) {</span>
+<span class="nc" id="L124">                directions.add(direction);</span>
+            }
+        }
+<span class="nc bnc" id="L127" title="All 2 branches missed.">        if (directions.isEmpty()) {</span>
+<span class="nc" id="L128">            return null;</span>
+        }
+<span class="nc" id="L130">        int i = new Random().nextInt(directions.size());</span>
+<span class="nc" id="L131">        return directions.get(i);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
